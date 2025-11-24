@@ -30,30 +30,18 @@
                 ];
               };
               postPatch = "";
-              nativeCheckInputs = [
-                final.ctestCheckHook
-              ];
-              # ref. https://github.com/Simple-Robotics/proxsuite/issues/426
-              preCheck = ''
-                disabledTests+=(
-                  "ProxQP::dense: test primal infeasibility solving"
-                  "dense maros meszaros using the api"
-                  "sparse maros meszaros using the API"
-                )
-              '';
             };
           };
-          eigen5 = final: prev: {
-            eigen = prev.eigen.overrideAttrs (super: rec {
-              version = "5.0.0";
-              src = final.fetchFromGitLab {
-                inherit (super.src) owner repo;
-                tag = version;
-                hash = "sha256-L1KUFZsaibC/FD6abTXrT3pvaFhbYnw+GaWsxM2gaxM=";
-              };
-              patches = [ ];
-              postPatch = "";
-            });
+          eigen_5 = final: prev: {
+            eigen = final.eigen_5;
+            pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+              (python-final: python-prev: {
+                scipy = python-prev.scipy.overrideAttrs {
+                  # broken on linux arm
+                  doInstallCheck = false;
+                };
+              })
+            ];
           };
         };
         perSystem =
@@ -73,7 +61,7 @@
               pkgs-eigen_5 = import inputs.nixpkgs {
                 inherit system;
                 overlays = [
-                  self.overlays.eigen5
+                  self.overlays.eigen_5
                   self.overlays.default
                 ];
               };
