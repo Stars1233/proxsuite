@@ -53,7 +53,7 @@ jobs:
 
       - run: echo "ARTIFACT_NAME=dist-${{ matrix.arch }}-${{ matrix.build }}" | sed 's/\*/_/g' >> $GITHUB_ENV
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: dist
