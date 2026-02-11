@@ -16,5 +16,5 @@ dependencies:
   - eigen
   - simde
   - libmatio
-  - numpy<2.4
+  - numpy
   - scipy
