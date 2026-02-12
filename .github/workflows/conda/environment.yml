@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - python-gil
   - cmake
   - compilers
   - make
@@ -16,5 +17,5 @@ dependencies:
   - eigen
   - simde
   - libmatio
-  - numpy<2.4
+  - numpy
   - scipy

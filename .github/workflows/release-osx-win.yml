@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         os: [macos-15-intel, macos-14, windows-2022]
         include:
           - os: windows-2022
@@ -41,7 +41,7 @@ jobs:
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-version: latest
+          miniforge-version: 25.11.0-1
           python-version: ${{ matrix.python-version }}
           activate-environment: proxsuite
           channels: conda-forge

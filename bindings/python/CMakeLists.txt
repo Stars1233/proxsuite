@@ -9,6 +9,7 @@ option(GENERATE_PYTHON_STUBS "Generate Python stubs" OFF)
 
 FINDPYTHON(REQUIRED)
 set(Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
+set(Python_VERSION ${Python3_VERSION})
 # Nanobind expects these targets instead of Python3::*
 # https://github.com/jrl-umi3218/jrl-cmakemodules/issues/708
 add_library(Python::Module ALIAS Python3::Module)
