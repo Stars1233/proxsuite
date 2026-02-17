@@ -57,7 +57,9 @@ exposeResults(nanobind::module_ m)
             &Info<T>::minimal_H_eigenvalue_estimate,
             "By default it equals 0, in order to get an estimate, set "
             "appropriately the setting option "
-            "find_H_minimal_eigenvalue.");
+            "find_H_minimal_eigenvalue.")
+    .def(nanobind::self == nanobind::self)
+    .def(nanobind::self != nanobind::self);
 
   ::nanobind::class_<Results<T>>(m, "Results")
     .def(::nanobind::init<isize, isize, isize>(),
