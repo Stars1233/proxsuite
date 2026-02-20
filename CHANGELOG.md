@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fix -Wdeprecated-literal-operator warning ([#420](https://github.com/Simple-Robotics/proxsuite/pull/420))
 - Fix compilation error with Apple Clang compiler ([#431](https://github.com/Simple-Robotics/proxsuite/pull/431))
 - Fix `settings.primal_infeasibility_solving` documentation ([#438](https://github.com/Simple-Robotics/proxsuite/pull/438))
+- Various fixes for equality comparisons for `Results` and `Settings` objects ([#450]https://github.com/Simple-Robotics/proxsuite/pull/450)
 
 ### Removed
 - Don't release PyPy package on GNU/Linux anymore ([#403](https://github.com/Simple-Robotics/proxsuite/pull/403))

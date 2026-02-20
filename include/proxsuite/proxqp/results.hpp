@@ -7,6 +7,7 @@
 #ifndef PROXSUITE_PROXQP_RESULTS_HPP
 #define PROXSUITE_PROXQP_RESULTS_HPP
 
+#include <algorithm>
 #include <proxsuite/helpers/optional.hpp>
 #include <Eigen/Core>
 #include <proxsuite/linalg/veg/type_traits/core.hpp>
@@ -218,7 +219,8 @@ operator==(const Info<T>& info1, const Info<T>& info2)
     info1.solve_time == info2.solve_time && info1.run_time == info2.run_time &&
     info1.objValue == info2.objValue && info1.pri_res == info2.pri_res &&
     info1.dua_res == info2.dua_res && info1.duality_gap == info2.duality_gap &&
-    info1.duality_gap == info2.duality_gap &&
+    info1.iterative_residual == info2.iterative_residual &&
+    info1.sparse_backend == info2.sparse_backend &&
     info1.minimal_H_eigenvalue_estimate == info2.minimal_H_eigenvalue_estimate;
   return value;
 }
@@ -235,7 +237,14 @@ bool
 operator==(const Results<T>& results1, const Results<T>& results2)
 {
   bool value = results1.x == results2.x && results1.y == results2.y &&
-               results1.z == results2.z && results1.info == results2.info;
+               results1.z == results2.z && results1.se == results2.se &&
+               results1.si == results2.si && results1.info == results2.info;
+  if (value) {
+    auto const& ac1 = results1.active_constraints;
+    auto const& ac2 = results2.active_constraints;
+    value = ac1.len() == ac2.len() &&
+            std::equal(ac1.ptr(), ac1.ptr() + ac1.len(), ac2.ptr());
+  }
   return value;
 }
 
