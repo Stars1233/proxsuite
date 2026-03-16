@@ -2,89 +2,96 @@
 
 ProxQP solves convex quadratic programs, which minimize a convex quadratic cost under some linear constraints. It is mathematically described as:
 
-$$\begin{equation}\label{eq:QP}\tag{QP}
+\f{equation}{
+\label{eq:QP}\tag{QP}
 \begin{aligned}
-    \min_{x\in\mathbb{R}^{d}} & \quad \frac{1}{2}x^{T}Hx+g^{T}x \\\
+    \min_{x\in\mathbb{R}^{d}} & \quad \frac{1}{2}x^{T}Hx+g^{T}x \\
     \text{s.t.}&\left\{
     \begin{array}{ll}
-         Ax = b, \\\
-        Cx \leq u. \\\
+         Ax = b, \\
+        Cx \leq u. \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}\\\
+\\
 \text{with } H\in\mathbb{R}^{d\times d}, A\in\mathbb{R}^{n_\text{eq}\times d}, C\in\mathbb{R}^{n_\text{in}\times d}, b\in\mathbb{R}^{n_\text{eq}}, u\in\mathbb{R}^{n_\text{in}}.
-$$
+\f}
+
 H is a real symmetric positive semi-definite matrix. d is the problem dimension (i.e., the number of primal variables), while n_eq and n_in are the numbers of equality and inequality constraints, respectively.
 
 For linearly constrained convex optimization problems such as \eqref{eq:QP}, strong duality holds, and the associated KKT conditions are necessary and sufficient for ensuring a primal-dual point (x,y,z) to be optimal (see, e.g.,[Section 5.2.3](https://web.stanford.edu/~boyd/cvxbook/)} and [Section 2, page 5](https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf) for more details).
 For \eqref{eq:QP}, the KKT system is given by the set of equations:
 
-$$\begin{equation}\label{qp:kkt}\tag{KKT}
+\f{equation}{
+\label{qp:kkt}\tag{KKT}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        Hx+g+A^Ty+C^Tz = 0, \\\
-        Ax-b = 0, \\\
-        Cx \leq u, \\\
-        z\odot[Cx-u] = 0,\\\
+        Hx+g+A^Ty+C^Tz = 0, \\
+        Ax-b = 0, \\
+        Cx \leq u, \\
+        z\odot[Cx-u] = 0,\\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 where the last equation involves the Hadamard product (i.e., for two vectors, u and v, the Hadamard product is the vector whose ith entry is u_i v_i).
 
 In practice, we look for a triplet (x,y,z) satisfying these optimality conditions \eqref{qp:kkt} up to a certain level of absolute accuracy (dependent of the application), leading us to the following absolute stopping criterion on the primal and dual residuals:
 
-$$\begin{equation}\label{eq:approx_qp_sol}
+\f{equation}{
+\label{eq:approx_qp_sol}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{abs}, \\\
-        \|Ax-b\|_{\infty} \leq \epsilon_{abs}, \\\
-        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{abs}. \\\
+        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{abs}, \\
+        \|Ax-b\|_{\infty} \leq \epsilon_{abs}, \\
+        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{abs}. \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 The infinite norm is preferred to the L2 norm as it is independent of the problem dimensions. It is also common to consider relative convergence criteria for early stopping, as absolute targets might not be reached due to numerical issues. ProxQP provides it in a similar way as OSQP (for more details, see, e.g., OSQP's [convergence](https://osqp.org/docs/solver/index.html#convergence) criteria or [section 3.4](https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf) in the corresponding paper). Hence more generally, the following stopping criterion can be used:
 
-$$\begin{equation}\label{eq:approx_qp_sol_relative_criterion}
+\f{equation}{
+\label{eq:approx_qp_sol_relative_criterion}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\\
-        \|Ax-b\|_{\infty} \leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\\
-        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Cx\|_{\infty},\|u\|_{\infty}). \\\
+        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\
+        \|Ax-b\|_{\infty} \leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\
+        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Cx\|_{\infty},\|u\|_{\infty}). \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 It is important to note that this stopping criterion on primal and dual residuals is not enough to guarantee that the returned solution satisfies all \eqref{qp:kkt} conditions. Indeed, as the problem has affine constraints and the objective is quadratic and convex, then as soon as the primal or the dual problem is feasible, strong duality holds (see, e.g., [Theorem 2](https://people.eecs.berkeley.edu/~elghaoui/Teaching/EE227A/lecture8.pdf) from L. El Ghaoui's lesson) and to satisfy all optimality conditions we need to add a third criterion on the *duality gap* \f$r_g\f$:
 
-$$\begin{equation}\label{eq:approx_dg_sol}
+\f{equation}{
+\label{eq:approx_dg_sol}
 \begin{aligned}
         r_g := | x^T H x + g^T x + b^T y + u^T [z]_+ + l^T [z]_- | \leq \epsilon^{\text{gap}}_{\text{abs}} + \epsilon^{\text{gap}}_{\text{rel}} \max(\|x^T H x\|, \|g^T x\|, \|b^T y\|, \|u^T [z]_+\|, \|l^T [z]_-\|), \\
 \end{aligned}
-\end{equation}$$
+\f}
 
 where \f$[z]_+\f$ and \f$[z]_-\f$ stand for the z projection onto the positive and negative orthant. ProxQP provides the ``check_duality_gap`` option to include this duality gap in the stopping criterion. Note that it is disabled by default, as other solvers don't check this criterion in general. Enable this option if you want a stronger guarantee that your solution is optimal. ProxQP will then check the same termination condition as SCS (for more details see, e.g., SCS's [optimality conditions checks](https://www.cvxgrp.org/scs/algorithm/index.html#optimality-conditions) as well as [section 7.2](https://doi.org/10.1137/20M1366307) in the corresponding paper). The absolute and relative thresholds \f$\epsilon^{\text{gap}}_{\text{abs}}, \epsilon^{\text{gap}}_{\text{rel}}\f$ for the duality gap can differ from those \f$\epsilon_{\text{abs}}, \epsilon_{\text{rel}}\f$ for residuals because, contrary to residuals which result from an infinite norm, the duality gap scales with the square root of the problem dimension (thus it is numerically harder to achieve a given duality gap for larger problems). A recommended choice is \f$\epsilon^{\text{gap}}_{\text{abs}} = \epsilon_{\text{abs}} \sqrt{\max(n, n_{\text{eq}}, n_{\text{ineq}})}\f$. Note finally that meeting all residual and duality-gap criteria can be difficult for ill-conditioned problems.
 
 Finally, note that ProxQP has a specific feature for handling primal infeasibility. More precisely, if the problem appears to be primal infeasible, it will solve the closest primal feasible problem in \f$\ell_2\f$ sense, and (x,y,z) will satisfy.
 
-$$\begin{equation}\label{eq:approx_closest_qp_sol_rel}
+\f{equation}{
+\label{eq:approx_closest_qp_sol_rel}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\\
-        \|A^\top(Ax-b)+C^\top[Cx-u]_+\|_{\infty} \leq \|A^\top 1 + C^\top 1\|_{\infty}*\epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\\
+        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\
+        \|A^\top(Ax-b)+C^\top[Cx-u]_+\|_{\infty} \leq \|A^\top 1 + C^\top 1\|_{\infty}*\epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 You can find more details on these subjects (and how to activate this feature with ProxQP) in the subsections describing the Settings and Results classes. You can also find more technical references with [this work](https://hal.science/hal-01057577).
 
@@ -143,7 +150,7 @@ The dense backend also has a specific feature for efficiently handling box inequ
 
 Furthermore, the dense version of ProxQP has two different backends with different advantages:
 * PrimalDualLDLT: it factorizes a regularized version of the KKT system and benefits from great accuracy and stability. Nevertheless, if the primal dimension (i.e., the one of x) is far smaller than the dimensions of the constraints, it will be slower than PrimalLDLT backend.
-* PrimalLDLT: it factorizes at the beginning the matrix $$H+\rho I+\frac{1}{\mu_{eq}} A^\top A$$ and goes on then with rank one updates. It is less accurate than PrimalDualLDLT backend, but it will be far quicker if it happens that the primal dimension is much smaller than the ones of the constraints.
+* PrimalLDLT: it factorizes at the beginning the matrix \f$H+\rho I+\frac{1}{\mu_{eq}} A^\top A\f$ and goes on then with rank one updates. It is less accurate than PrimalDualLDLT backend, but it will be far quicker if it happens that the primal dimension is much smaller than the ones of the constraints.
 
 The QP constructor uses, by default, an automatic choice for deciding which backend suits a priori bests user's needs. It is based on a heuristic comparing a priori computational complexity of each backend. However, if you have more insights into your needs (e.g., accuracy specifications, primal dimension is known to be far larger than the one of the constraints etc.), we encourage you to specify directly in the constructor which backend to use. It is as simple as the following:
 
@@ -465,18 +472,20 @@ If set to this option, the solver will start with no initial guess, which means 
 \subsubsection OverviewEqualityConstrainedInitialGuess Equality constrained initial guess
 
 If set to this option, the solver will solve at the beginning the following system for warm starting x and y.
-$$\begin{bmatrix}
-H+\rho I & A^T \\\
+\f[
+\begin{bmatrix}
+H+\rho I & A^T \\
 A & -\mu_{eq} I
 \end{bmatrix}
 \begin{bmatrix}
-x \\\ y
+x \\ y
 \end{bmatrix}
 =
 \begin{bmatrix}
--g \\\
+-g \\
 b
-\end{bmatrix}$$
+\end{bmatrix}
+\f]
 z stays to 0. In general, this option warm starts well equality constrained QP.
 
 \subsubsection OverviewWarmStartWithPreviousResult Warm start with the previous result
@@ -520,44 +529,47 @@ The result subclass is composed of the following:
 
 If the solver has solved the problem, the triplet (x,y,z) satisfies:
 
-$$\begin{equation}\label{eq:approx_qp_sol_rel}
+\f{equation}{
+\label{eq:approx_qp_sol_rel}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\\
-        \|Ax-b\|_{\infty} \leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\\
-        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Cx\|_{\infty},\|u\|_{\infty}), \\\
+        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\
+        \|Ax-b\|_{\infty} \leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\
+        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Cx\|_{\infty},\|u\|_{\infty}), \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 accordingly with the parameters eps_abs and eps_rel chosen by the user.
 
 If the problem is primal infeasible and you have enabled the solver to solve the closest feasible problem, then (x,y,z) will satisfy.
-$$\begin{equation}\label{eq:approx_closest_qp_sol_rel_bis}
+\f{equation}{
+\label{eq:approx_closest_qp_sol_rel_bis}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\\
-        \|A^\top(Ax-b)+C^\top[Cx-u]_+\|_{\infty} \leq \|A^\top 1 + C^\top 1\|_{\infty}*\epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\\
+        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\
+        \|A^\top(Ax-b)+C^\top[Cx-u]_+\|_{\infty} \leq \|A^\top 1 + C^\top 1\|_{\infty}*\epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 (se, si) stands in this context for the optimal shifts in \f$\ell_2\f$ sense which enables recovering a primal feasible problem. More precisely, they are derived such that
 
-\begin{equation}\label{eq:QP_primal_feasible}\tag{QP_feas}
+\f{equation}{
+\label{eq:QP_primal_feasible}\tag{QP\_feas}
 \begin{aligned}
-    \min_{x\in\mathbb{R}^{d}} & \quad \frac{1}{2}x^{T}Hx+g^{T}x \\\
+    \min_{x\in\mathbb{R}^{d}} & \quad \frac{1}{2}x^{T}Hx+g^{T}x \\
     \text{s.t.}&\left\{
     \begin{array}{ll}
-         Ax = b+se, \\\
-        Cx \leq u+si, \\\
+         Ax = b+se, \\
+        Cx \leq u+si, \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}\\\
+\f}
 defines a primal feasible problem.
 
 Note that if you use the dense backend and its specific feature for handling box inequality constraints, then the first \f$n_{in}\f$ elements of z correspond to multipliers associated to the linear inequality formed with \f$C\f$ matrix, whereas the last \f$d\f$ elements correspond to multipliers associated to the box inequality constraints (see for example solve_dense_qp.cpp or solve_dense_qp.py).
@@ -614,34 +626,36 @@ The solver has five status:
 
 Infeasibility is detected using the necessary conditions exposed in [section 3.4](https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf). More precisely, primal infeasibility is assumed if the following conditions are matched for some non zeros dy and dz (according to the eps_prim_inf variable set by the user):
 
-$$\begin{equation}\label{eq:approx_qp_sol_prim_inf}\tag{PrimalInfeas}
+\f{equation}{
+\label{eq:approx_qp_sol_prim_inf}\tag{PrimalInfeas}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|A^Tdy\|_{\infty} \leq \epsilon_{\text{primal_inf}} \|dy\|_{\infty} , \\\
-        b^T dy \leq -\epsilon_{\text{primal_inf}} \|dy\|_{\infty}, \\\
-        \|C^Tdz\|_{\infty} \leq  \epsilon_{\text{primal_inf}} \|dz\|_{\infty}, \\\
-        u^T [dz]_+ - l^T[-dz]_+\leq -\epsilon_{\text{primal_inf}} \|dz\|_{\infty}. \\\
+        \|A^Tdy\|_{\infty} \leq \epsilon_{\text{primal\_inf}} \|dy\|_{\infty} , \\
+        b^T dy \leq -\epsilon_{\text{primal\_inf}} \|dy\|_{\infty}, \\
+        \|C^Tdz\|_{\infty} \leq  \epsilon_{\text{primal\_inf}} \|dz\|_{\infty}, \\
+        u^T [dz]_+ - l^T[-dz]_+\leq -\epsilon_{\text{primal\_inf}} \|dz\|_{\infty}. \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 Dual infeasibility is assumed if the following two conditions are matched for some non-zero dx (according to the eps_dual_inf variable set by the user):
 
-$$\begin{equation}\label{eq:approx_qp_sol_dual_inf}\tag{DualInfeas}
+\f{equation}{
+\label{eq:approx_qp_sol_dual_inf}\tag{DualInfeas}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hdx\|_{\infty} \leq \epsilon_{\text{dual_inf}} \|dx\|_{\infty} , \\\
-        g^T dx \leq -\epsilon_{\text{dual_inf}} \|dx\|_{\infty}, \\\
-        \|Adx\|_{\infty}\leq \epsilon_{\text{dual_inf}} \|dx\|_{\infty}, \\\
-        (Cdz)_i \geq \epsilon_{\text{dual_inf}} \|dx\|_{\infty}, \mbox{ if } u_i = +\infty, \\\
-        (Cdz)_i  \leq \epsilon_{\text{dual_inf}} \|dx\|_{\infty}, \mbox{ otherwise }.
+        \|Hdx\|_{\infty} \leq \epsilon_{\text{dual\_inf}} \|dx\|_{\infty} , \\
+        g^T dx \leq -\epsilon_{\text{dual\_inf}} \|dx\|_{\infty}, \\
+        \|Adx\|_{\infty}\leq \epsilon_{\text{dual\_inf}} \|dx\|_{\infty}, \\
+        (Cdz)_i \geq \epsilon_{\text{dual\_inf}} \|dx\|_{\infty}, \mbox{ if } u_i = +\infty, \\
+        (Cdz)_i  \leq \epsilon_{\text{dual\_inf}} \|dx\|_{\infty}, \mbox{ otherwise }.
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 If the problem turns out to be primal or dual infeasible, then x, y, and z stored in the results class will be the certificate of primal or dual infeasibility. More precisely:
 * if the problem is dual infeasible, Qp.results.x will be the certificate dx of dual infeasibility satisfying \eqref{eq:approx_qp_sol_dual_inf} at precisifion Qp.settings.eps_dual_inf specified by the user,
@@ -659,7 +673,9 @@ then we recommend using the solver with the dense backend.
 
 The sparsity ratio of matrix A is defined as:
 
-$$ \text{sparsity}(A) = \frac{\text{nnz}(A)}{\text{number}_{\text{row}}(A) * \text{number}_{\text{col}}(A)}, $$
+\f[
+\text{sparsity}(A) = \frac{\text{nnz}(A)}{\text{number}_{\text{row}}(A) * \text{number}_{\text{col}}(A)},
+\f]
 
 which accounts for the percentage of non-zero elements in matrix A.
 

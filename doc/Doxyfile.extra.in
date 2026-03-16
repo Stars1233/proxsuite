@@ -31,8 +31,7 @@ EXCLUDE_SYMLINKS        = YES
 
 EXAMPLE_PATH            = @PROJECT_SOURCE_DIR@/examples
 
-EXTRA_PACKAGES          = {bm,stmaryrd}
-FORMULA_MACROFILE       = @PROJECT_SOURCE_DIR@/doc/macros.inc
+EXTRA_PACKAGES          = bm stmaryrd amsmath amssymb
 
 GENERATE_TREEVIEW       = YES
 
@@ -40,8 +39,6 @@ VERBATIM_HEADERS        = YES
 
 
 HTML_HEADER             = @PROJECT_SOURCE_DIR@/doc/header.html
-HTML_EXTRA_STYLESHEET   = @PROJECT_SOURCE_DIR@/doc/doxygen-awesome.css
-HTML_EXTRA_FILES        = @PROJECT_SOURCE_DIR@/doc/doxygen-awesome-darkmode-toggle.js
 
 
 TAGFILES                =
@@ -60,4 +57,3 @@ USE_MDFILE_AS_MAINPAGE  = @PROJECT_SOURCE_DIR@/doc/1-Overview.md
 BUILTIN_STL_SUPPORT     = YES
 HAVE_DOT                = YES
 DOT_IMAGE_FORMAT        = SVG
-DOT_TRANSPARENT         = YES
