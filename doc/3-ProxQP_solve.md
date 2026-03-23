@@ -2,74 +2,80 @@
 
 ProxQP solves convex quadratic programs, which consists in minimizing a convex quadratic cost under some linear constraints. It is mathematically described as:
 
-$$\begin{equation}\label{eq:QP}\tag{QP}
+\f{equation}{
+\label{eq:QP}\tag{QP}
 \begin{aligned}
-    \min_{x\in\mathbb{R}^{d}} & \quad \frac{1}{2}x^{T}Hx+g^{T}x \\\
+    \min_{x\in\mathbb{R}^{d}} & \quad \frac{1}{2}x^{T}Hx+g^{T}x \\
     \text{s.t.}&\left\{
     \begin{array}{ll}
-         Ax = b, \\\
-        Cx \leq u. \\\
+         Ax = b, \\
+        Cx \leq u. \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}\\\
+\\
 \text{with } H\in\mathbb{R}^{d\times d}, A\in\mathbb{R}^{n_\text{eq}\times d}, C\in\mathbb{R}^{n_\text{in}\times d}, b\in\mathbb{R}^{n_\text{eq}}, u\in\mathbb{R}^{n_\text{in}}.
-$$
+\f}
+
 H is a real symmetric positive semi-definite matrix. d is the problem dimension (i.e., the number of primal variables), while n_eq and n_in are the numbers of equality and inequality constraints respectively.
 
 For linearly constrained convex optimization problems such as \eqref{eq:QP}, strong duality holds and the associated KKT conditions are necessary and sufficient for ensuring a primal-dual point (x,y,z) to be optimal (see, e.g.,[Section 5.2.3](https://web.stanford.edu/~boyd/cvxbook/)} and [Section 2, page 5](https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf) for more details).
 For \eqref{eq:QP}, the KKT system is given by the set of equations:
 
-$$\begin{equation}\label{qp:kkt}\tag{KKT}
+\f{equation}{
+\label{qp:kkt}\tag{KKT}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        Hx+g+A^Ty+C^Tz = 0, \\\
-        Ax-b = 0, \\\
-        Cx \leq u, \\\
-        z\odot[Cx-u] = 0,\\\
+        Hx+g+A^Ty+C^Tz = 0, \\
+        Ax-b = 0, \\
+        Cx \leq u, \\
+        z\odot[Cx-u] = 0,\\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 where the last equation involves the Hadamard product (i.e., for two vectors u and v, the Hadamard product is the vector whose ith entry is u_i v_i).
 
 In practice, we look for a triplet (x,y,z) satisfying these optimality conditions \eqref{qp:kkt} up to a certain level of absolute accuracy (dependent of the application), leading us to the following absolute stopping criterion on the primal and dual residuals:
 
-$$\begin{equation}\label{eq:approx_qp_sol}
+\f{equation}{
+\label{eq:approx_qp_sol}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{abs}, \\\
-        \|Ax-b\|_{\infty} \leq \epsilon_{abs}, \\\
-        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{abs}. \\\
+        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{abs}, \\
+        \|Ax-b\|_{\infty} \leq \epsilon_{abs}, \\
+        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{abs}. \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 The infite norm is preferred to the L2 norm as it is independent of the problem dimensions. It is also common to consider relative convergence criteria for early-stopping, as absolute targets might not bet reached due to numerical issues. ProxQP provides it in a similar way as OSQP (for more details see, e.g., OSQP's [convergence](https://osqp.org/docs/solver/index.html#convergence) criteria or [section 3.4](https://web.stanford.edu/~boyd/papers/pdf/osqp.pdf) in the corresponding paper). Hence more generally the following stopping criterion can be used:
 
-$$\begin{equation}\label{eq:approx_qp_sol_relative_criterion}
+\f{equation}{
+\label{eq:approx_qp_sol_relative_criterion}
 \begin{aligned}
     &\left\{
     \begin{array}{ll}
-        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\\
-        \|Ax-b\|_{\infty} \leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\\
-        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Cx\|_{\infty},\|u\|_{\infty}). \\\
+        \|Hx+g+A^Ty+C^Tz\|_{\infty} \leq  \epsilon_{\text{abs}} + \epsilon_{\text{rel}}\max(\|Hx\|_{\infty},\|A^Ty\|_{\infty},\|C^Tz\|_{\infty},\|g\|_{\infty}), \\
+        \|Ax-b\|_{\infty} \leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Ax\|_{\infty},\|b\|_{\infty}), \\
+        \|[Cx-u]_+\|_{\infty}\leq \epsilon_{\text{abs}} +\epsilon_{\text{rel}}\max(\|Cx\|_{\infty},\|u\|_{\infty}). \\
     \end{array}
     \right.
 \end{aligned}
-\end{equation}$$
+\f}
 
 It is important to note that this stopping criterion on primal and dual residuals is not enough to guarantee that the returned solution satisfies all \eqref{qp:kkt} conditions. Indeed, as the problem has affine constraints and the objective is quadratic and convex, then as soon as the primal or the dual problem is feasible, then strong duality holds (see e.g., [Theorem 2](https://people.eecs.berkeley.edu/~elghaoui/Teaching/EE227A/lecture8.pdf) from L. El Ghaoui's lesson) and to satisfy all optimality conditions we need to add a third criterion on the *duality gap* \f$r_g\f$:
 
-$$\begin{equation}\label{eq:approx_dg_sol}
+\f{equation}{
+\label{eq:approx_dg_sol}
 \begin{aligned}
         r_g := | x^T H x + g^T x + b^T y + u^T [z]_+ + l^T [z]_- | \leq \epsilon^{\text{gap}}_{\text{abs}} + \epsilon^{\text{gap}}_{\text{rel}} \max(\|x^T H x\|, \|g^T x\|, \|b^T y\|, \|u^T [z]_+\|, \|l^T [z]_-\|), \\
 \end{aligned}
-\end{equation}$$
+\f}
 
 where \f$[z]_+\f$ and \f$[z]_-\f$ stand for the projection of z onto the positive and negative orthant. ProxQP provides the ``check_duality_gap`` option to include this duality gap in the stopping criterion. Note that it is disabled by default, as other solvers don't check in general this criterion. Enable this option if you want a stronger guarantee that your solution is optimal. ProxQP will then check the same termination condition as SCS (for more details see, e.g., SCS's [optimality conditions checks](https://www.cvxgrp.org/scs/algorithm/index.html#optimality-conditions) as well as [section 7.2](https://doi.org/10.1137/20M1366307) in the corresponding paper). The absolute and relative thresholds \f$\epsilon^{\text{gap}}_{\text{abs}}, \epsilon^{\text{gap}}_{\text{rel}}\f$ for the duality gap can differ from those \f$\epsilon_{\text{abs}}, \epsilon_{\text{rel}}\f$ for residuals because, contrary to residuals which result from an infinite norm, the duality gap scales with the square root of the problem dimension (thus it is numerically harder to achieve a given duality gap for larger problems). A recommended choice is \f$\epsilon^{\text{gap}}_{\text{abs}} = \epsilon_{\text{abs}} \sqrt{\max(n, n_{\text{eq}}, n_{\text{ineq}})}\f$. Note finally that meeting all residual and duality-gap criteria can be difficult for ill-conditioned problems.
 

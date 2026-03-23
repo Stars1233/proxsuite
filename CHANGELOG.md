@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Recursive stub generation for Python bindings ([#419](https://github.com/Simple-Robotics/proxsuite/pull/419))
 
 ### Changed
-- Redefine the `load_qp` function in the Maros-Meszaros unit tests ([#433])(https://github.com/Simple-Robotics/proxsuite/pull/433)
+- Redefine the `load_qp` function in the Maros-Meszaros unit tests ([#433](https://github.com/Simple-Robotics/proxsuite/pull/433))
 - Change the default branch to `devel` ([#395](https://github.com/Simple-Robotics/proxsuite/pull/395))
 - Change `dual_feasibility` test threshold in `sparse_maros_meszaros` unit test ([#403](https://github.com/Simple-Robotics/proxsuite/pull/403))
 - replace `std::numeric_limits<T>::infinity()` by `std::numeric_limits<T>::max()` ([#413](https://github.com/Simple-Robotics/proxsuite/pull/413))
@@ -18,13 +18,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Better dynamic module handling ([#419](https://github.com/Simple-Robotics/proxsuite/pull/419))
 
 ### Fixed
-- Correction of the status update for `PROXQP_SOLVED_CLOSEST_PRIMAL_FEASIBLE` ([#432])(https://github.com/Simple-Robotics/proxsuite/pull/432)
+- Correction of the status update for `PROXQP_SOLVED_CLOSEST_PRIMAL_FEASIBLE` ([#432](https://github.com/Simple-Robotics/proxsuite/pull/432))
 - Use the right table to store `configure-args` cmeel argument ([#403](https://github.com/Simple-Robotics/proxsuite/pull/403))
 - Allow project to be used as an external CMake project (FetchContent) ([#408](https://github.com/Simple-Robotics/proxsuite/pull/408))
 - Fix -Wdeprecated-literal-operator warning ([#420](https://github.com/Simple-Robotics/proxsuite/pull/420))
 - Fix compilation error with Apple Clang compiler ([#431](https://github.com/Simple-Robotics/proxsuite/pull/431))
 - Fix `settings.primal_infeasibility_solving` documentation ([#438](https://github.com/Simple-Robotics/proxsuite/pull/438))
-- Various fixes for equality comparisons for `Results` and `Settings` objects ([#450]https://github.com/Simple-Robotics/proxsuite/pull/450)
+- Various fixes for equality comparisons for `Results` and `Settings` objects ([#450](https://github.com/Simple-Robotics/proxsuite/pull/450)
+- Fix doc generation with latex ([#453](https://github.com/Simple-Robotics/proxsuite/pull/453))
 
 ### Removed
 - Don't release PyPy package on GNU/Linux anymore ([#403](https://github.com/Simple-Robotics/proxsuite/pull/403))
