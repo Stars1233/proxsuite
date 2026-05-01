@@ -63,7 +63,7 @@ jobs:
       with:
         submodules: recursive
 
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: conda-incubator/setup-miniconda@v4
       with:
         activate-environment: proxsuite
         environment-file: .github/workflows/conda/environment.yml
