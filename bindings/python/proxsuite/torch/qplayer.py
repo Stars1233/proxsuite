@@ -18,7 +18,7 @@ def QPFunction(
     omp_parallel=False,
     structural_feasibility=True,
 ):
-    """!
+    r"""!
     Solve a batch of Quadratic Programming (QP) problems.
 
     This function solves QP problems of the form:

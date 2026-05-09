@@ -25,4 +25,5 @@ configure-args = ["-DBUILD_TESTING:BOOL=OFF","-DBUILD_PYTHON_INTERFACE:BOOL=ON",
 
 [tool.ruff.lint]
 ignore = [ "E741" ]
+extend-select = ["W605"]
 exclude = [ "cmake-module/*", "bindings/python/external/nanobind/*" ]
